@@ -1,17 +1,15 @@
 import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+//import * as AWSXRay from 'aws-xray-sdk'
+import { DocumentClient } from "aws-sdk/clients/dynamodb"
 import { Types } from 'aws-sdk/clients/s3';
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+//const XAWS = AWSXRay.captureAWS(AWS)
 // TODO: Implement the dataLayer logic
 export class TodosAccess {
-    getTodos: any
-  
     constructor(
-      private readonly dynamoDBClient: DocumentClient = createDynamoDBClient(),
+      private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
       private readonly todossTable = process.env.TODOS_TABLE,
       private readonly s3Client: Types = new AWS.S3({ signatureVersion: 'v4' }),
       private readonly s3BucketName = process.env.TODOS_S3_BUCKET
@@ -33,7 +31,7 @@ export class TodosAccess {
       }
   }
     
-  const result = await this.dynamoDBClient.query(params).promise();
+  const result = await this.docClient.query(params).promise();
   console.log(result);
   const items = result.Items;
 
@@ -41,7 +39,7 @@ export class TodosAccess {
  }
 
   async createTodos(todos: TodoItem): Promise<TodoItem> {
-    await this.dynamoDBClient.put({
+    await this.docClient.put({
       TableName: this.todossTable,
       Item: todos
     }).promise()
@@ -70,7 +68,7 @@ export class TodosAccess {
         ReturnValues: "ALL_NEW"
     }
 
-    const result = await this.dynamoDBClient.update(params).promise();
+    const result = await this.docClient.update(params).promise();
     console.log(result);
     const attributes = result.Attributes;
 
@@ -100,22 +98,10 @@ export class TodosAccess {
             },
         };
 
-        const result = await this.dynamoDBClient.delete(params).promise();
+        const result = await this.docClient.delete(params).promise();
         console.log(result);
 
         return "" as string;
     }
 }
-  
-  function createDynamoDBClient() {
-    if (process.env.IS_OFFLINE) {
-      console.log('Creating a local DynamoDB instance')
-      return new XAWS.DynamoDB.DocumentClient({
-        region: 'localhost',
-        endpoint: 'http://localhost:8000'
-      })
-    }
-  
-    return new XAWS.DynamoDB.DocumentClient()
-  }
   
