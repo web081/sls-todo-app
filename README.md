@@ -1,15 +1,12 @@
 # Serverless TODO APP
 
-To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
-
+Sls Todo app is to implement serverless framework api service with aws lambda, this app is simple add to do list to application and remove todo list after work or task is done. 
 # Functionality of the application
 
 This application will allow creating/removing/updating/fetching TODO items. Each TODO item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
 
 # TODO items
-
-The application should store TODO items, and each TODO item contains the following fields:
-
+Application store todo list
 You might also store an id of a user who created a TODO item.
 
 ## Prerequisites
